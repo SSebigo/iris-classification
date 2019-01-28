@@ -1,0 +1,9 @@
+[package]
+name = "iris-classification"
+version = "0.1.0"
+authors = ["François Grèzes <grezesfrancois@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+ndarray = "0.12.1"
+ndarray-rand = "0.9.0"
