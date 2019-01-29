@@ -1,11 +1,11 @@
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Iris {
     sepal_length: f64,
     sepal_width: f64,
     petal_length: f64,
     petal_width: f64,
     iris: Vec<f64>,
-    class: String,
+    class: Vec<usize>,
 }
 
 impl Iris {
@@ -14,9 +14,9 @@ impl Iris {
         sepal_width: f64,
         petal_length: f64,
         petal_width: f64,
-        class: String,
+        class: Vec<usize>,
     ) -> Self {
-        Iris {
+        Self {
             sepal_length: sepal_length,
             sepal_width: sepal_width,
             petal_length: petal_length,
@@ -55,5 +55,13 @@ impl Iris {
             self.petal_length,
             self.petal_width,
         ];
+    }
+
+    pub fn iris(&self) -> &Vec<f64> {
+        &self.iris
+    }
+
+    pub fn class(&self) -> &Vec<usize> {
+        &self.class
     }
 }

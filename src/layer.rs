@@ -1,10 +1,10 @@
 use ndarray::prelude::*;
 use std::str::FromStr;
 
-#[derive(Debug)]
+#[derive(Default, Clone, Debug)]
 pub struct Layer {
-    neurons: Array2<f64>,
-    weights: Array2<f64>,
+    pub neurons: Array2<f64>,
+    pub weights: Array2<f64>,
     activation: String
 }
 
@@ -39,25 +39,30 @@ impl Layer {
         }
     }
 
+    pub fn activate(&mut self) {
+        match self.activation.as_str() {
+            "sigmoid" => self.sigmoid(),
+            "fast_sigmoid" => self.fast_sigmoid(),
+            "tanh" => self.tanh(),
+            _ => {},
+        }
+    }
+
     fn sigmoid(&mut self) {
         for neuron in self.neurons.iter_mut() {
             *neuron = 1_f64 / (1_f64 + -neuron.exp());
         }
     }
 
-    pub fn neurons(&self) -> &Array2<f64> {
-        &self.neurons
+    fn fast_sigmoid(&mut self) {
+        for neuron in self.neurons.iter_mut() {
+            *neuron = *neuron / (1_f64 + neuron.abs());
+        }
     }
 
-    pub fn neurons_mut(&mut self, neurons: Array2<f64>) {
-        self.neurons = neurons
-    }
-
-    pub fn weights(&self) -> &Array2<f64> {
-        &self.weights
-    }
-
-    pub fn weights_mut(&mut self, weights: Array2<f64>) {
-        self.weights = weights
+    fn tanh(&mut self) {
+        for neuron in self.neurons.iter_mut() {
+            *neuron = neuron.tanh();
+        }
     }
 }

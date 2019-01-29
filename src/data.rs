@@ -1,5 +1,8 @@
-use crate::iris::Iris;
 use std::str::FromStr;
+use rand::thread_rng;
+use rand::seq::SliceRandom;
+
+use crate::iris::Iris;
 
 #[derive(Debug)]
 pub struct Data {
@@ -37,10 +40,12 @@ impl Data {
                 Ok(petal_width) => petal_width,
                 Err(error) => panic!("There was a problem converting str to f64: {:?}", error),
             };
-            let class = String::from_str(line_data[4]);
-            let class = match class {
-                Ok(class) => class,
-                Err(error) => panic!("There was a problem converting str to String: {:?}", error),
+
+            let class: Vec<usize> = match line_data[4] {
+                "Iris-setosa" => vec![1, 0, 0],
+                "Iris-versicolor" => vec![0, 1, 0],
+                "Iris-virginica" => vec![0, 0, 1],
+                _ => vec![0, 0, 0],
             };
 
             let mut new_iris: Iris =
@@ -48,5 +53,10 @@ impl Data {
             new_iris.normalize();
             self.data.push(new_iris);
         }
+        self.data.shuffle(&mut thread_rng());
+    }
+
+    pub fn data(&self) -> &Vec<Iris> {
+        &self.data
     }
 }

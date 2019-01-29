@@ -1,8 +1,9 @@
-use rand::distributions::Uniform;
-use ndarray::Array2;
+use ndarray::{Array, Array2};
 use ndarray_rand::RandomExt;
+use rand::distributions::Uniform;
 use std::str::FromStr;
 
+use crate::iris::Iris;
 use crate::layer::Layer;
 
 #[derive(Debug)]
@@ -39,14 +40,14 @@ impl Model {
         let length: usize = self.layers.len();
         if length > 0 {
             let rows: usize = match self.layers.last() {
-                Some(result) => result.neurons().cols(),
-                None => panic!("There is no layer added to the model"),
+                Some(result) => result.neurons.cols(),
+                None => panic!("There is no layer added to the model!"),
             };
-            let cols: usize = layer.neurons().cols();
+            let cols: usize = layer.neurons.cols();
 
             match self.layers.last_mut() {
-                Some(result) => result.weights_mut(Array2::random((rows, cols), Uniform::new(0., 1.))),
-                None => panic!("There is no layer added to the model"),
+                Some(result) => result.weights = Array2::random((rows, cols), Uniform::new(0., 1.)),
+                None => panic!("There is no layer added to the model!"),
             }
         }
         self.layers.push(layer);
@@ -72,8 +73,30 @@ impl Model {
         }
     }
 
-    pub fn fit(training_set: Vec<f64>, set_labels: Vec<&str>, epochs: usize) {
-        unimplemented!();
+    pub fn fit(&mut self, training_set: Vec<Iris>, set_labels: Vec<&str>, epochs: usize) {
+        for epoch in 0..epochs {
+            println!("Epoch {}/{}", epoch + 1, epochs);
+            for elem in training_set.iter() {
+                for i in 0..self.layers.len() {
+                    match i {
+                        0 => {
+                            let rows: usize = self.layers[i].neurons.rows();
+                            let cols: usize = self.layers[i].neurons.cols();
+                            self.layers[i].neurons = match Array2::from_shape_vec((rows, cols), elem.iris().to_vec()) {
+                                Ok(result) => result,
+                                Err(error) => panic!("Shape does not correspond to the number of elements in vector v {}!", error),
+                            }
+                        }
+                        _ => {
+                            let matrix_1: &Array2<f64> = &self.layers[i-1].neurons;
+                            let matrix_2: &Array2<f64> = &self.layers[i-1].weights;
+                            self.layers[i].neurons = matrix_1.dot(matrix_2);
+                            self.layers[i].activate();
+                        }
+                    }
+                }
+            }
+        }
     }
 
     pub fn evaluate(test_set: Vec<f64>, set_labels: Vec<&str>) -> (usize, usize) {
@@ -89,5 +112,11 @@ impl Model {
         let beta_1 = 0.9;
         let beta_2 = 0.999;
         let epsilon = 10_f64.powf(-8_f64);
+    }
+
+    fn mean_squared_error(prediction: f64, target: f64) -> f64 {
+        let squared_error = (prediction - target).sqrt();
+
+        1_f64
     }
 }
