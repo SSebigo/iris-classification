@@ -41,11 +41,11 @@ impl Data {
                 Err(error) => panic!("There was a problem converting str to f64: {:?}", error),
             };
 
-            let class: Vec<usize> = match line_data[4] {
-                "Iris-setosa" => vec![1, 0, 0],
-                "Iris-versicolor" => vec![0, 1, 0],
-                "Iris-virginica" => vec![0, 0, 1],
-                _ => vec![0, 0, 0],
+            let class: Vec<f64> = match line_data[4] {
+                "Iris-setosa" => vec![1_f64, 0_f64, 0_f64],
+                "Iris-versicolor" => vec![0_f64, 1_f64, 0_f64],
+                "Iris-virginica" => vec![0_f64, 0_f64, 1_f64],
+                _ => vec![0_f64, 0_f64, 0_f64],
             };
 
             let mut new_iris: Iris =

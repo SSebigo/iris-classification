@@ -76,17 +76,10 @@ impl Model {
     pub fn fit(&mut self, training_set: Vec<Iris>, set_labels: Vec<&str>, epochs: usize) {
         for epoch in 0..epochs {
             println!("Epoch {}/{}", epoch + 1, epochs);
-            for elem in training_set.iter() {
+            for iris in training_set.iter() {
                 for i in 0..self.layers.len() {
                     match i {
-                        0 => {
-                            let rows: usize = self.layers[i].neurons.rows();
-                            let cols: usize = self.layers[i].neurons.cols();
-                            self.layers[i].neurons = match Array2::from_shape_vec((rows, cols), elem.iris().to_vec()) {
-                                Ok(result) => result,
-                                Err(error) => panic!("Shape does not correspond to the number of elements in vector v {}!", error),
-                            }
-                        }
+                        0 => { self.layers[i].neurons = iris.iris.clone(); }
                         _ => {
                             let matrix_1: &Array2<f64> = &self.layers[i-1].neurons;
                             let matrix_2: &Array2<f64> = &self.layers[i-1].weights;
@@ -95,6 +88,16 @@ impl Model {
                         }
                     }
                 }
+
+                let prediction_error: Array2<f64>;
+                match self.layers.last() {
+                    Some(result) => {
+                        prediction_error = self.loss(result.neurons.clone(), iris.class.clone());
+                    },
+                    None => panic!("There is no layer added to the model!"),
+                }
+
+                println!("prediction error: {:#?}", prediction_error);
             }
         }
     }
@@ -114,9 +117,11 @@ impl Model {
         let epsilon = 10_f64.powf(-8_f64);
     }
 
-    fn mean_squared_error(prediction: f64, target: f64) -> f64 {
-        let squared_error = (prediction - target).sqrt();
+    fn loss(&mut self, prediction: Array2<f64>, target: Array2<f64>) -> Array2<f64> {
+        target - prediction
+    }
 
-        1_f64
+    fn mean_squared_error(&mut self, prediction: Array2<f64>, target: Array2<f64>) -> Array2<f64> {
+        prediction - target
     }
 }
