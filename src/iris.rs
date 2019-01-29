@@ -15,7 +15,7 @@ impl Iris {
         petal_length: f64,
         petal_width: f64,
         class: String,
-    ) -> Iris {
+    ) -> Self {
         Iris {
             sepal_length: sepal_length,
             sepal_width: sepal_width,
