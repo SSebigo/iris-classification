@@ -5,12 +5,12 @@ use std::str::FromStr;
 pub struct Layer {
     pub neurons: Array2<f64>,
     pub weights: Array2<f64>,
-    activation: String
+    activation: String,
 }
 
 impl Layer {
     pub fn flatten(input_shape: (usize, usize)) -> Self {
-        let neurons: Array2<f64> = Array::default((1, (input_shape.0*input_shape.1)));
+        let neurons: Array2<f64> = Array::default((1, (input_shape.0 * input_shape.1)));
         let weights: Array2<f64> = Array::default((0, 0));
         let activation: String = match String::from_str("") {
             Ok(result) => result,
@@ -44,13 +44,13 @@ impl Layer {
             "sigmoid" => self.sigmoid(),
             "fast_sigmoid" => self.fast_sigmoid(),
             "tanh" => self.tanh(),
-            _ => {},
+            _ => {}
         }
     }
 
     fn sigmoid(&mut self) {
         for neuron in self.neurons.iter_mut() {
-            *neuron = 1_f64 / (1_f64 + -neuron.exp());
+            *neuron = 1_f64 / (1_f64 + (-*neuron).exp());
         }
     }
 
@@ -58,6 +58,10 @@ impl Layer {
         for neuron in self.neurons.iter_mut() {
             *neuron = *neuron / (1_f64 + neuron.abs());
         }
+    }
+
+    fn sigmoid_prime(&mut self) {
+        unimplemented!();
     }
 
     fn tanh(&mut self) {

@@ -1,5 +1,5 @@
-mod iris;
 mod data;
+mod iris;
 mod layer;
 mod model;
 
@@ -22,7 +22,7 @@ fn main() -> io::Result<()> {
 
     // println!("data: {:#?}", data);
 
-    let (train_set, test_set) = data.data().split_at((150.0*0.80) as usize);
+    let (train_set, test_set) = data.data().split_at((150.0 * 0.80) as usize);
     let (train_set, test_set) = (train_set.to_vec(), test_set.to_vec());
 
     // println!("train set: {:#?}\ntest set: {:#?}", train_set, test_set);
@@ -31,10 +31,10 @@ fn main() -> io::Result<()> {
 
     let mut model: Model = Model::new();
     model.add(Layer::flatten((2, 2)));
-    model.add(Layer::dense(512, "fast_sigmoid"));
-    model.add(Layer::dense(3, "fast_sigmoid"));
+    model.add(Layer::dense(16, "sigmoid"));
+    model.add(Layer::dense(3, "sigmoid"));
 
-    model.compile("adam", "sparse_categorical_crossentropy", vec!["accuracy"]);
+    model.compile("adam", "loss", vec!["accuracy"]);
 
     model.fit(train_set, labels, 5);
 

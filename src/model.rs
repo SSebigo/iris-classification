@@ -76,6 +76,8 @@ impl Model {
     pub fn fit(&mut self, training_set: Vec<Iris>, set_labels: Vec<&str>, epochs: usize) {
         for epoch in 0..epochs {
             println!("Epoch {}/{}", epoch + 1, epochs);
+            let mut correct_predict: usize = 0;
+            let mut average_cost: f64 = 0_f64;
             for iris in training_set.iter() {
                 for i in 0..self.layers.len() {
                     match i {
@@ -89,15 +91,40 @@ impl Model {
                     }
                 }
 
-                let prediction_error: Array2<f64>;
-                match self.layers.last() {
-                    Some(result) => {
-                        prediction_error = self.loss(result.neurons.clone(), iris.class.clone());
+                // Increment correct_predict if prediction is correct...
+                let index1: usize = 0;
+                let index2: usize = 0;
+                // if 
+
+                if index1 == index2 { correct_predict += 1; };
+
+                let mut prediction_error: f64 = 0_f64;
+                match self.loss.as_str() {
+                    "loss" => {
+                        match self.layers.last() {
+                            Some(result) => {
+                                println!("prediction: {:#?}", result.neurons);
+                                prediction_error = self.loss(result.neurons.clone(), iris.class.clone());
+                                average_cost += prediction_error;
+                            },
+                            None => panic!("There is no layer added to the model!"),
+                        }
                     },
-                    None => panic!("There is no layer added to the model!"),
+                    "sparse_categorical_crossentropy" => {}
+                    _ => {},
                 }
 
                 println!("prediction error: {:#?}", prediction_error);
+            }
+
+            average_cost = average_cost/training_set.len() as f64;
+            let accuracy: f64 = (correct_predict/training_set.len()) as f64;
+
+            match self.metrics[0].as_str() {
+                "accuracy" => {
+                    println!("loss: {} - acc: {}", average_cost, accuracy);
+                },
+                _ => {}
             }
         }
     }
@@ -110,15 +137,19 @@ impl Model {
         unimplemented!();
     }
 
-    fn adam_optimizer() {
+    fn adam_optimizer(&mut self) {
         let learning_rate = 0.001;
         let beta_1 = 0.9;
         let beta_2 = 0.999;
         let epsilon = 10_f64.powf(-8_f64);
     }
 
-    fn loss(&mut self, prediction: Array2<f64>, target: Array2<f64>) -> Array2<f64> {
-        target - prediction
+    fn gradient_descent(&mut self) {
+        unimplemented!();
+    }
+
+    fn loss(&mut self, prediction: Array2<f64>, target: Array2<f64>) -> f64 {
+        (prediction - target).mapv(|v| v.powi(2)).sum()
     }
 
     fn mean_squared_error(&mut self, prediction: Array2<f64>, target: Array2<f64>) -> Array2<f64> {
